@@ -5,4 +5,3 @@
 / HomeR GET
 
 /comments CommentR GET POST
-/profile ProfileR GET

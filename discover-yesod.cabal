@@ -23,7 +23,6 @@ library
                      Handler.Common
                      Handler.Home
                      Handler.Comment
-                     Handler.Profile
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
