@@ -1,5 +1,5 @@
 <div .ui.container>
-
+    THIS IS A <h2>templates/profile.hamlet</h2>
     <h1>
       Access granted!
 
