@@ -1,6 +1,20 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Handler.Comment where
 
 import Import
+import GHC.Generics ()
+import Data.Aeson ()
+import Data.Aeson.Types ()
+
+data Person = Person { name :: Text, age  :: Int } deriving (Generic, Show)
+
+instance ToJSON Person
+instance FromJSON Person
+
+getJsonR :: Handler Value
+getJsonR = do
+    returnJson $ Person {name = "Joe", age = 12}
 
 
 -- This is a handler function for the GET request method on the HomeR

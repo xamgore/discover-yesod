@@ -5,3 +5,4 @@
 / HomeR GET
 
 /comments CommentR GET POST
+/json JsonR GET
