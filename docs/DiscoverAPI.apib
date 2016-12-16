@@ -5,26 +5,73 @@ HOST: http://polls.apiblueprint.org/
 
 ## Users Collection [/users]
 
++ Attributes (array[User])
+
 ### List Users [GET /users{?page,friends_of}]
 
-## User Detail [/users/<id>]
+## User [/users/<id>]
 
-### Get User [GET]
+### Retrieve a User [GET]
+
++ Response 200 (application/json)
+    + Attributes (User)
 
 ## Places Collection [/places]
 
++ Attributes (array[Place])
+
 ### List Places [GET /places{?page,nearby_xy,visited_by}]
 
-### Create New Place [POST]
+### Create a Place [POST]
 
-## Place Detail [/places/<id>]
++ Attributes (Place Base)
 
-### Get Place [GET]
++ Request (application/json)
 
-### Discover A Place [POST /place/<id>/discover]
++ Response 200 (application/json)
+    + Attributes (Place)
+
+## Place [/places/<id>]
+
+### Retrieve a Place [GET]
+
++ Response 200 (application/json)
+    + Attributes (Place)
+
+### Discover a Place [POST /place/<id>/discover]
 
 ## Place Photo Collection [/place/<id>/photos]
 
 ### List Photo Urls [GET]
 
 ### Upload a Photo [POST]
+
+# Data Structures
+
+## User Base (object)
+
++ id: "66d68fc0-1be0-41a7-8497-d77a2d7e2805" (string)
+
++ name: "Jane Doe" (string)
+
+    Name
+
++ discovers: 25 (number)
+
+    A positive integer that represents how much places the user had discovered
+
+## Place Base (object)
+
++ id: "66d68fc0-1be0-41a7-8497-d77a2d7e2805" (string)
+
++ name: "My Place" (string)
+
+    Name
+
++ x: 12.00032 (number)
+
+    X coordinate
+
++ y: 13.00021 (number)
+
+    Y coordinate
