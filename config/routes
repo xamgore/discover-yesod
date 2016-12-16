@@ -5,4 +5,18 @@
 / HomeR GET
 
 /comments CommentR GET POST
+
 /json JsonR GET
+
+/users UsersR GET
+    
+/users/#Text UserR GET
+
+/places PlacesR GET POST
+
+/places/#Text PlaceR GET
+
+/places/#Text/discover DiscoverPlaceR POST
+
+/places/#Text/photos PlacesPhotosR GET POST
+
