@@ -1,0 +1,30 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# discovery-yeson API
+
+## Users Collection [/users]
+
+### List Users [GET /users{?page,friends_of}]
+
+## User Detail [/users/<id>]
+
+### Get User [GET]
+
+## Places Collection [/places]
+
+### List Places [GET /places{?page,nearby_xy,visited_by}]
+
+### Create New Place [POST]
+
+## Place Detail [/places/<id>]
+
+### Get Place [GET]
+
+### Discover A Place [POST /place/<id>/discover]
+
+## Place Photo Collection [/place/<id>/photos]
+
+### List Photo Urls [GET]
+
+### Upload a Photo [POST]
