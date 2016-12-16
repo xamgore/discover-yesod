@@ -6,8 +6,8 @@ getUsersR :: Handler Html
 getUsersR = do
     pageMaybe <- lookupGetParam "page"
     userMaybe <- lookupGetParam "friends_of"
-    case userMaybe 
-        Just user -> sendFile "text/html" ("static/index.html" ++ user)
+    case userMaybe of
+        Just user -> sendFile "text/html" ("static/index.html" ++ unpack user)
         Nothing   -> sendFile "text/html" "static/index.html"
 
 getUserR :: Text -> Handler Html
