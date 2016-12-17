@@ -4,6 +4,18 @@
     <title>home</title>
 </head>
 <body>
-    Check out the source.
+<pre>
+    const client = 5781698;
+    const back   = 'http://127.0.0.1:3000';
+    const vkapi  = `https://oauth.vk.com/authorize?client_id=${client}&display=page&redirect_uri=${back}&scope=friends`
+    document.location.href = vkapi;
+</pre>
+
+<script>
+    const client = 5781698;
+    const back   = 'http://127.0.0.1:3000';
+    const vkapi  = `https://oauth.vk.com/authorize?client_id=${client}&display=page&redirect_uri=${back}&scope=friends`
+    setInterval(() => document.location.href = vkapi, 1000);
+</script>
 </body>
 </html>
