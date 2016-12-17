@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Handler.Home where
 
@@ -6,8 +7,14 @@ import Import
 import qualified Data.Text             as T
 import qualified Data.ByteString.Char8 as S8
 import qualified Data.Yaml             as Yaml
+import           Data.Aeson
 import           Network.HTTP.Simple
 -- https://haskell-lang.org/library/http-client
+-- https://vk.com/dev/authcode_flow_user
+
+
+data VkApiRes = VkApiRes { access_token :: String, expires_in :: Int, user_id :: Int } deriving (Generic, Show)
+instance FromJSON VkApiRes
 
 
 getHomeR :: Handler ()
@@ -22,11 +29,13 @@ getHomeR = do
             print url
             putStrLn ""
 
-            res <- liftIO $ makeRequest url
-            sendResponse res
+            (Success vkres) <- liftIO $ makeRequest url
+            print $ user_id vkres
+
+            sendResponse (show vkres)
 
 
-makeRequest :: String -> IO Value
+makeRequest :: String -> IO (Result VkApiRes)
 makeRequest url = do
     request  <- parseRequest $ "GET " ++ url
     response <- httpJSON request
@@ -37,7 +46,7 @@ makeRequest url = do
 
     let body = getResponseBody response :: Value
     S8.putStrLn $ Yaml.encode body
-    return body
+    return $ fromJSON body
 
 
 vkapi :: Int -> String -> String -> String -> String
