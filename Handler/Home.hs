@@ -5,16 +5,19 @@ module Handler.Home where
 
 import Import
 import qualified Data.Text             as T
+import qualified Data.Text.Lazy        as TL (toStrict)
+import           Data.Text.Lazy.Builder      (toLazyText)
 import qualified Data.ByteString.Char8 as S8
 import qualified Data.Yaml             as Yaml
 import           Data.Aeson
+import           Data.Aeson.Encode (encodeToTextBuilder)
 import           Network.HTTP.Simple
 -- https://haskell-lang.org/library/http-client
 -- https://vk.com/dev/authcode_flow_user
 
 
-data VkApiRes = VkApiRes { access_token :: String, expires_in :: Int, user_id :: Int } deriving (Generic, Show)
-instance FromJSON VkApiRes
+data VkAuth = VkAuth { access_token :: String, expires_in :: Int, user_id :: Int } deriving (Generic, Show)
+instance FromJSON VkAuth
 
 
 getHomeR :: Handler ()
@@ -29,27 +32,37 @@ getHomeR = do
             print url
             putStrLn ""
 
-            (Success vkres) <- liftIO $ makeRequest url
-            print $ user_id vkres
+            (Success vk) <- liftIO $ makeRequest url
+            friendsList  <- liftIO $ getFriends vk
 
-            sendResponse (show vkres)
+            sendResponse (T.unpack friendsList)
 
 
-makeRequest :: String -> IO (Result VkApiRes)
+makeRequest :: String -> IO (Result VkAuth)
 makeRequest url = do
     request  <- parseRequest $ "GET " ++ url
     response <- httpJSON request
-
-    -- putStrLn $ "The status code was: " ++
-    --            (T.pack $ show (getResponseStatusCode response))
-    -- print $ getResponseHeader "Content-Type" response
 
     let body = getResponseBody response :: Value
     S8.putStrLn $ Yaml.encode body
     return $ fromJSON body
 
 
+getFriends :: VkAuth -> IO Text
+getFriends vkAuth = do
+    request  <- parseRequest $ "GET https://api.vk.com/method/friends.get?user_id=" ++ (show $ user_id vkAuth) ++
+                "&order=hints&count=10&offset=0&fields=uid,first_name,last_name,photo_medium&access_token=" ++
+                (access_token vkAuth)
+    response <- httpJSON request
+    let body  = getResponseBody response :: Value
+
+    return (valToText body)
+
+
 vkapi :: Int -> String -> String -> String -> String
 vkapi client secret back code =
     "https://oauth.vk.com/access_token?client_id=" ++ show client ++
     "&client_secret=" ++ secret ++ "&redirect_uri=" ++ back ++ "&code=" ++ code
+
+valToText :: Value -> Text
+valToText = TL.toStrict . toLazyText . encodeToTextBuilder
