@@ -7,7 +7,7 @@ HOST: http://polls.apiblueprint.org/
 
 + Attributes (array[User])
 
-### List Users [GET /users{?page,friends_of}]
+### List Users [GET /users{?page[size],page[number],friends_of}]
 
 ## User [/users/<id>]
 
@@ -20,7 +20,7 @@ HOST: http://polls.apiblueprint.org/
 
 + Attributes (array[Place])
 
-### List Places [GET /places{?page,nearby_xy,visited_by}]
+### List Places [GET /places{?page[size],page[number],coords[x],coords[y],visited_by}]
 
 ### Create a Place [POST]
 
@@ -40,7 +40,7 @@ HOST: http://polls.apiblueprint.org/
 
 ## Discoveries Collection [/discoveries]
 
-### List Discoveries [GET /discoveries{?page,user}]
+### List Discoveries [GET /discoveries{?page[size],page[number],user}]
 
 ### Discoveries a Place [POST]
 
