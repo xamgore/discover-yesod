@@ -15,16 +15,32 @@ import Database.Persist.Sqlite
 import GHC.Generics ()
 import Data.Aeson ()
 import Data.Aeson.Types ()
+import Text.Read
 
 getEntity entityId = do
     entity <- runDB $ get404 entityId
     returnJson entity
 
+
+-- todo: safe parsing
+pageOptions :: Maybe Text -> Maybe Text -> [SelectOpt val]
+pageOptions pageSizeMaybe pageNumberMaybe = 
+    case (pageSizeMaybe, pageNumberMaybe) of
+        (Just size, Just number) -> let sizeNum   = read $ unpack size 
+                                        numberNum = read $ unpack number
+                                      in [OffsetBy (sizeNum * numberNum), 
+                                          LimitTo sizeNum]
+        otherwise -> []
+
 getUsersR :: Handler Value
 getUsersR = do
-    pageMaybe <- lookupGetParam "page"
+    pageSizeMaybe   <- lookupGetParam "page[size]"
+    pageNumberMaybe <- lookupGetParam "page[number]"
     userMaybe <- lookupGetParam "friends_of"
-    users <- runDB $ selectList [] [Asc UserId]
+    users <- runDB $ let filters = []
+                         options :: [SelectOpt User]
+                         options = pageOptions pageSizeMaybe pageNumberMaybe
+                      in selectList filters options
     returnJson users
 
 getUserR :: UserId -> Handler Value
@@ -32,10 +48,17 @@ getUserR = getEntity
 
 getPlacesR :: Handler Value
 getPlacesR = do
-    pageMaybe <- lookupGetParam "page"
-    positionMaybe <- lookupGetParam "nearby_xy"
-    userMaybe <- lookupGetParam "visited_by"
-    places <- runDB $ selectList [] [Asc PlaceId]
+    pageSizeMaybe   <- lookupGetParam "page[size]"
+    pageNumberMaybe <- lookupGetParam "page[number]"
+    positionXMaybe  <- lookupGetParam "coords[x]"
+    positionYMaybe  <- lookupGetParam "coords[y]"
+    userMaybe       <- lookupGetParam "visited_by"
+    places <- runDB $ let filters = case userMaybe of
+                            Just user -> []
+                            otherwise -> []
+                          options :: [SelectOpt Place]
+                          options = pageOptions pageSizeMaybe pageNumberMaybe
+                       in selectList [] options
     returnJson places
 
 postPlacesR :: Handler Value
@@ -55,11 +78,15 @@ postDiscoveriesR = do
 
 getDiscoveriesR :: Handler Value
 getDiscoveriesR = do
-    pageMaybe <- lookupGetParam "page"
+    pageSizeMaybe   <- lookupGetParam "page[size]"
+    pageNumberMaybe <- lookupGetParam "page[number]"
     userMaybe <- lookupGetParam "user"
-    places <- case userMaybe of
-        Just user -> runDB $ selectList [DiscoveryUser ==. toSqlKey 1] [Asc DiscoveryId]
-        Nothing   -> runDB $ selectList [] [Asc DiscoveryId]
+    places <- runDB $ let filters = case userMaybe of
+                            Just user -> [DiscoveryUser ==. toSqlKey (read $ unpack user)]
+                            otherwise -> []
+                          options :: [SelectOpt Discovery]
+                          options = pageOptions pageSizeMaybe pageNumberMaybe
+                       in selectList filters options
     returnJson places
 
 getDiscoveryR :: DiscoveryId -> Handler Value
