@@ -1,6 +1,21 @@
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE ViewPatterns               #-}
 module Handler.DiscoverApi where
 
 import Import
+import Database.Persist.Sqlite
+import GHC.Generics ()
+import Data.Aeson ()
+import Data.Aeson.Types ()
+
 
 getUsersR :: Handler Html
 getUsersR = do
@@ -10,28 +25,34 @@ getUsersR = do
         Just user -> sendFile "text/html" ("static/index.html" ++ unpack user)
         Nothing   -> sendFile "text/html" "static/index.html"
 
-getUserR :: Text -> Handler Html
-getUserR userId = sendFile "text/html" "static/index.html"
+getUserR :: UserId -> Handler Html
+getUserR userId = undefined
 
-getPlacesR :: Handler Html
+getPlacesR :: Handler Value
 getPlacesR = do
     pageMaybe <- lookupGetParam "page"
     positionMaybe <- lookupGetParam "nearby_xy"
     userMaybe <- lookupGetParam "visited_by"
-    sendFile "text/html" "static/index.html"
+    places <- runDB $ selectList [] [Asc PlaceName]
+    returnJson places
 
-postPlacesR :: Handler Html
-postPlacesR = sendFile "text/html" "static/index.html"
+postPlacesR :: Handler Value
+postPlacesR = do
+    place <- (requireJsonBody :: Handler Place)
+    insertedPlace <- runDB $ insertEntity place
+    returnJson insertedPlace
 
-getPlaceR :: Text -> Handler Html
-getPlaceR placeId = sendFile "text/html" "static/index.html"
+getPlaceR :: PlaceId -> Handler Value
+getPlaceR placeId = do
+    place <- runDB $ get404 placeId
+    returnJson place
 
-postDiscoverPlaceR :: Text -> Handler Html
-postDiscoverPlaceR placeId = sendFile "text/html" "static/index.html"
+postDiscoverPlaceR :: PlaceId -> Handler Html
+postDiscoverPlaceR placeId = undefined
 
-getPlacesPhotosR :: Text -> Handler Html
-getPlacesPhotosR placeId = sendFile "text/html" "static/index.html"
+getPlacesPhotosR :: PlaceId -> Handler Html
+getPlacesPhotosR placeId = undefined
 
-postPlacesPhotosR :: Text -> Handler Html
-postPlacesPhotosR placeId = sendFile "text/html" "static/index.html"
+postPlacesPhotosR :: PlaceId -> Handler Html
+postPlacesPhotosR placeId = undefined
 

@@ -10,13 +10,13 @@
 
 /users UsersR GET
     
-/users/#Text UserR GET
+/users/#UserId UserR GET
 
 /places PlacesR GET POST
 
-/places/#Text PlaceR GET
+/places/#PlaceId PlaceR GET
 
-/places/#Text/discover DiscoverPlaceR POST
+/places/#PlaceId/discover DiscoverPlaceR POST
 
-/places/#Text/photos PlacesPhotosR GET POST
+/places/#PlaceId/photos PlacesPhotosR GET POST
 
