@@ -3,6 +3,7 @@ User
     password Text Maybe
     UniqueUser ident
     deriving Typeable
+    deriving Show
 
 Email
     email Text

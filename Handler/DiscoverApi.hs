@@ -16,24 +16,27 @@ import GHC.Generics ()
 import Data.Aeson ()
 import Data.Aeson.Types ()
 
+getEntity entityId = do
+    entity <- runDB $ get404 entityId
+    returnJson entity
 
-getUsersR :: Handler Html
-getUsersR = do
-    pageMaybe <- lookupGetParam "page"
-    userMaybe <- lookupGetParam "friends_of"
-    case userMaybe of
-        Just user -> sendFile "text/html" ("static/index.html" ++ unpack user)
-        Nothing   -> sendFile "text/html" "static/index.html"
+getUsersR :: Handler Value
+getUsersR = undefined
+    -- do
+    -- pageMaybe <- lookupGetParam "page"
+    -- userMaybe <- lookupGetParam "friends_of"
+    -- users <- runDB $ selectList [] [Asc UserId]
+    -- returnJson users
 
-getUserR :: UserId -> Handler Html
-getUserR userId = undefined
+getUserR :: UserId -> Handler Value
+getUserR userId = undefined -- getEntity userId
 
 getPlacesR :: Handler Value
 getPlacesR = do
     pageMaybe <- lookupGetParam "page"
     positionMaybe <- lookupGetParam "nearby_xy"
     userMaybe <- lookupGetParam "visited_by"
-    places <- runDB $ selectList [] [Asc PlaceName]
+    places <- runDB $ selectList [] [Asc PlaceId]
     returnJson places
 
 postPlacesR :: Handler Value
@@ -43,16 +46,27 @@ postPlacesR = do
     returnJson insertedPlace
 
 getPlaceR :: PlaceId -> Handler Value
-getPlaceR placeId = do
-    place <- runDB $ get404 placeId
-    returnJson place
+getPlaceR = getEntity
 
-postDiscoverPlaceR :: PlaceId -> Handler Html
-postDiscoverPlaceR placeId = undefined
+postDiscoveriesR :: Handler Value
+postDiscoveriesR = do
+    discovery <- (requireJsonBody :: Handler Discovery)
+    insertedDiscovery <- runDB $ insertEntity discovery
+    returnJson insertedDiscovery
 
-getPlacesPhotosR :: PlaceId -> Handler Html
+getDiscoveriesR :: Handler Value
+getDiscoveriesR = do
+    pageMaybe <- lookupGetParam "page"
+    userMaybe <- lookupGetParam "user"
+    places <- runDB $ selectList [] [Asc DiscoveryId]
+    returnJson places
+
+getDiscoveryR :: DiscoveryId -> Handler Value
+getDiscoveryR = getEntity
+
+getPlacesPhotosR :: PlaceId -> Handler Value
 getPlacesPhotosR placeId = undefined
 
-postPlacesPhotosR :: PlaceId -> Handler Html
+postPlacesPhotosR :: PlaceId -> Handler Value
 postPlacesPhotosR placeId = undefined
 

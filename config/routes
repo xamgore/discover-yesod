@@ -16,7 +16,9 @@
 
 /places/#PlaceId PlaceR GET
 
-/places/#PlaceId/discover DiscoverPlaceR POST
+/discoveries DiscoveriesR GET POST
+
+/discoveries/#DiscoveryId DiscoveryR GET
 
 /places/#PlaceId/photos PlacesPhotosR GET POST
 
