@@ -57,7 +57,9 @@ getDiscoveriesR :: Handler Value
 getDiscoveriesR = do
     pageMaybe <- lookupGetParam "page"
     userMaybe <- lookupGetParam "user"
-    places <- runDB $ selectList [] [Asc DiscoveryId]
+    places <- case userMaybe of
+        Just user -> runDB $ selectList [DiscoveryUser ==. toSqlKey 1] [Asc DiscoveryId]
+        Nothing   -> runDB $ selectList [] [Asc DiscoveryId]
     returnJson places
 
 getDiscoveryR :: DiscoveryId -> Handler Value
