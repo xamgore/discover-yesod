@@ -69,6 +69,7 @@ library
                  , persistent                    >= 2.0        && < 2.7
                  , persistent-sqlite             >= 2.1.1      && < 2.7
                  , persistent-template           >= 2.0        && < 2.7
+                 , esqueleto
                  , template-haskell
                  , shakespeare                   >= 2.0        && < 2.1
                  , hjsmin                        >= 0.1        && < 0.3
@@ -158,6 +159,7 @@ test-suite test
                  , yesod
                  , persistent
                  , persistent-sqlite
+                 , esqueleto
                  , resourcet
                  , monad-logger
                  , shakespeare

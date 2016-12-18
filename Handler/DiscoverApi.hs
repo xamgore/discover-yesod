@@ -17,6 +17,8 @@ import Data.Aeson ()
 import Data.Aeson.Types ()
 import Data.Text.Read
 import Text.Read
+import qualified Database.Esqueleto      as E
+import           Database.Esqueleto      ((^.))
 
 getEntity entityId = do
     entity <- runDB $ get404 entityId
