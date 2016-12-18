@@ -34,8 +34,10 @@ getHomeR = do
 
             (Success vk) <- liftIO $ makeRequest url
             friendsList  <- liftIO $ getFriends vk
+            boardTempl   <- liftIO $ readFile "static/board.html"
 
-            sendResponse (T.unpack friendsList)
+            addHeader "Content-Type" "text/html"
+            sendResponse $ boardTempl ++ "<script>init(" ++ (T.unpack friendsList) ++ ");</script>"
 
 
 makeRequest :: String -> IO (Result VkAuth)
