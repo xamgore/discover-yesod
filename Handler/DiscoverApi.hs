@@ -21,15 +21,14 @@ getEntity entityId = do
     returnJson entity
 
 getUsersR :: Handler Value
-getUsersR = undefined
-    -- do
-    -- pageMaybe <- lookupGetParam "page"
-    -- userMaybe <- lookupGetParam "friends_of"
-    -- users <- runDB $ selectList [] [Asc UserId]
-    -- returnJson users
+getUsersR = do
+    pageMaybe <- lookupGetParam "page"
+    userMaybe <- lookupGetParam "friends_of"
+    users <- runDB $ selectList [] [Asc UserId]
+    returnJson users
 
 getUserR :: UserId -> Handler Value
-getUserR userId = undefined -- getEntity userId
+getUserR = getEntity
 
 getPlacesR :: Handler Value
 getPlacesR = do
