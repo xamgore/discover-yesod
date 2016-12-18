@@ -94,8 +94,13 @@ getDiscoveryR :: DiscoveryId -> Handler Value
 getDiscoveryR = getEntity
 
 getPlacesPhotosR :: PlaceId -> Handler Value
-getPlacesPhotosR placeId = undefined
+getPlacesPhotosR placeId = do
+    photos <- runDB $ selectList [PhotoPlace ==. placeId] []
+    returnJson photos
 
 postPlacesPhotosR :: PlaceId -> Handler Value
-postPlacesPhotosR placeId = undefined
+postPlacesPhotosR placeId = do
+    photo <- (requireJsonBody :: Handler Photo)
+    insertedPhoto <- runDB $ insertEntity photo
+    returnJson insertedPhoto
 
