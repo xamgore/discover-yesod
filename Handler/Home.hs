@@ -4,6 +4,7 @@
 module Handler.Home where
 
 import Import
+import           Web.Cookie
 import qualified Data.Text             as T
 import qualified Data.Text.Lazy        as TL (toStrict)
 import           Data.Text.Lazy.Builder      (toLazyText)
@@ -22,26 +23,36 @@ instance FromJSON VkAuth
 
 getHomeR :: Handler ()
 getHomeR = do
-    codeMaybe <- lookupGetParam "code"
-    print codeMaybe
+    maybeUserId <- lookupCookie "user_id"
 
-    case (T.unpack <$> codeMaybe) of
-        Nothing   -> sendFile "text/html" "static/index.html"
+    case maybeUserId of
+        Just uid -> sendFile "text/html" "static/index.html"
+        Nothing  -> authorizeUser
+
+
+authorizeUser :: Handler ()
+authorizeUser = do
+    maybeCode <- fmap T.unpack <$> lookupGetParam "code"
+
+    case maybeCode of
+        Nothing   -> sendFile "text/html" "static/auth.html"
         Just code -> do
-            let url = vkapi 5781698 "plMjp5oUptPh4QKxAfkz" "http://127.0.0.1:3000" code
-            print url
-            putStrLn ""
+            (Just host) <- lookupHeader "host"
 
-            (Success vk) <- liftIO $ makeRequest url
-            friendsList  <- liftIO $ getFriends vk
-            boardTempl   <- liftIO $ readFile "static/board.html"
+            let url = vkapi 5781698 "plMjp5oUptPh4QKxAfkz" (S8.unpack host) code
+            vkRes <- liftIO $ getVkAuthToken url
 
-            addHeader "Content-Type" "text/html"
-            sendResponse $ boardTempl ++ "<script>init(" ++ (T.unpack friendsList) ++ ");</script>"
+            case vkRes of
+                Success vk ->
+                    setCookie $ def { setCookieName = "user_id", setCookieValue = S8.pack $ show $ user_id vk }
+                _ ->
+                    deleteCookie "user_id" ""
+
+            sendFile "text/html" "static/index.html"
 
 
-makeRequest :: String -> IO (Result VkAuth)
-makeRequest url = do
+getVkAuthToken :: String -> IO (Result VkAuth)
+getVkAuthToken url = do
     request  <- parseRequest $ "GET " ++ url
     response <- httpJSON request
 
