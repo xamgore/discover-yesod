@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Discover</title>
 
     <link href="https://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet">
@@ -18,20 +18,20 @@
             background-color: #f56a6a;
         }
 
-        .layer {
+        #button {
             position: absolute;
             width: 100%;
             height: 100%;
             text-align: center;
         }
 
-        @keyframes example {
+        @keyframes flash {
             from { box-shadow: 0 0 25px 0 white; }
             to { box-shadow: 0 0 5px 0 white; }
         }
 
-        .circle {
-            animation: example 0.7s ease-in-out 0s infinite alternate;
+        #circle {
+            animation: flash 0.7s ease-in-out 0s infinite alternate;
             background-color: white;
             z-index: 20;
             display: block;
@@ -40,15 +40,16 @@
             width:  56px;
             height: 56px;
             position: relative;
+            top: 76%;
         }
 
-        .discover {
+        #title {
             font: 4.6em 'Satisfy';
             color: white;
             margin-bottom: 1em;
         }
 
-        .container {
+        #layer {
             position: absolute;
             display: flex;
             justify-content: center;
@@ -60,23 +61,14 @@
     </style>
 </head>
 <body>
-<div class="layer">
-    <div style="position: absolute; bottom: 15%; width: 100%;">
-        <div id="vk" class="circle"></div>
-    </div>
-</div>
-<body>
-<div class="container">
-    <span class="discover">Discover</span>
-</div>
+<div id="button"><div id="circle"></div></div>
+<div id="layer"><div id="title">Discover</div></div>
 
 <script>
     const client = 5781698;
     const back   = `http://${window.location.host}`;
     const vkapi  = `https://oauth.vk.com/authorize?client_id=${client}&display=page&redirect_uri=${back}&scope=friends,offline`
-    document.querySelector('#vk').onclick = e => document.location.href = vkapi;
-
-    alert(back);
+    document.querySelector('#circle').onclick = e => document.location.href = vkapi;
 </script>
 </body>
 </html>
