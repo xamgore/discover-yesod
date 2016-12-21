@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Discover</title>
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto|Satisfy" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/2.5.0/fuse.min.js"></script>
 
     <style>
         * {
@@ -17,42 +18,43 @@
         html, body {
             margin: 0;
             padding: 0;
-            /*background-color: #f56a6a /*#f9f9f9;*/
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .head {
+            max-width: 400px;
+            position: fixed;
+            top: 0;
+            width: 100%;
             height: 50px;
             background: #f56a6a;
+            z-index: 9;
             color: white;
-            font: 1rem 'Roboto';
-            position: fixed;
-            z-index: 10;
-            width: 100%;
+            font: 1rem Roboto;
         }
 
         .head .title {
-            font-size: 2em;
-            padding: 5px;
+            font: 2rem Roboto;
+            line-height: 50px;
             text-align: center;
         }
 
         .head .back {
-            display: block;
-            float: left;
+            position: absolute;
+            top: 0;
+            padding: 0 20px 0 15px;
             font-size: 2.5rem;
-            padding: 0 10px;
+            line-height: 50px;
         }
 
         input[type='text'] {
             all: initial;
-            color: #ccc;
-            background: white;
-            width: calc(100% - 200px);
-            font: 1em 'Verdana';
-            padding: 0 15px;
+            color: gray;
+            width: calc(100% - 100px);
             height: 2rem;
             line-height: 2rem;
-            border-radius: 15px;
+            font: 1em Verdana;
         }
 
         button.find {
@@ -68,29 +70,29 @@
         }
 
         .search {
+            color: #ccc;
+            background: white;
             border-bottom: 1px solid #ccc;
-            margin-bottom: 10px;
         }
 
         .content {
-            top: 50px;
+            top: calc(50px + 2rem);
             position: relative;
         }
 
         img {
             height: 50px;
+            width: 50px;
             border-radius: 100%;
             float: left;
-            margin: 0 5px;
-            padding-right: 5px;
+            margin: 0 10px 0 10px;
         }
 
         .item {
-            height: 50px;
-            line-height: 50px;
-            margin-bottom: 5px;
-            margin-top: 5px;
-            font: 1.5em 'Roboto';
+            padding: 5px 0 5px 0;
+            height: 60px;
+            font-family: Roboto, sans-serif;
+            font-size: 1.3em;
             color: #444;
         }
 
@@ -98,45 +100,63 @@
             background-color: #f6f6f6;
         }
 
+        .item:hover {
+            background-color: #e3e3e3;
+        }
+
+        .item.you {
+            color: white;
+            background: rgb(245, 106, 106);
+        }
+
+        .item.you img {
+            border: 2px solid white;
+        }
+
+        .item.you .points {
+            color: white;
+        }
+
         span.points {
             float: right;
+            line-height: 50px;
             padding: 0 10px;
             display: inline-block;
-            padding-top: 10px;
             color: #e46f6f;
+            font-size: 1.4rem;
         }
 
         span.name {
             display: inline-block;
-            padding-top: 10px;
+            line-height: 50px;
         }
     </style>
 </head>
 <body>
 
-<div class="head">
-    <div class="back">
-        <i class="fa fa-angle-left" aria-hidden="true"></i>
-    </div>
-    <div class="title">Leader Board</div>
-</div>
-
-<div class="content" id="content">
-    <div class="search">
-        <input type="text" placeholder="Search"/>
-        <!-- <button class="find">
-            <i class="fa fa-search" aria-hidden="true"></i>
-        </button> -->
+<div id="app">
+    <div class="head">
+        <div class="back" @click="back"><i class="fa fa-angle-left"></i></div>
+        <div class="title">Leader Board</div>
+        <div class="search">
+            <i class="fa fa-search" aria-hidden="true" style="padding: 0px 4px 0 9px"></i>
+            <input type="text" placeholder="Search" v-model="search" />
+        </div>
     </div>
 
-    <div class="item" v-for="item in items">
-        <img :src="item.photo_medium" alt="">
-        <span class="name">{{ item.first_name }} {{ item.last_name }}</span>
-        <span class="points">{{ item.id }}</span>
+    <div class="content">
+        <div>
+            <div class="item" :class="{ you: man.id == user_id }" v-for="man in people" @click="goto(man.id)">
+                <img :src="man.photo_medium" alt="">
+                <span class="points">{{ man.id }}</span>
+                <span class="name">{{ man.first_name }} {{ man.last_name }}</span>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
+
 Array.prototype.sortByKey = function (key) {
     const compare = function(a, b) {
         var x = a[key]; var y = b[key];
@@ -145,19 +165,27 @@ Array.prototype.sortByKey = function (key) {
     return this.sort(compare);
 }
 
-function init(d) {
-    new Vue({
-        el: '.content',
-        data: {
-            friends: d.response
-        },
-        computed: {
-            items() {
-                return this.friends.sortByKey('id');
-            }
+var data=[{id:475146,first_name:"Andrey",last_name:"Sitnik",photo_medium:"https://pp.vk.me/c630429/v630429146/4a468/H8xYH6B9l-c.jpg"},{id:12605637,first_name:"Vsevolod",last_name:"Kvachev",photo_medium:"https://pp.vk.me/c631121/v631121637/463d8/WR0E9hSbi-c.jpg"},{id:18112620,first_name:"Natasha",last_name:"Senchenko",photo_medium:"https://pp.vk.me/c408726/v408726620/a13b/2SCVaEja_6c.jpg"},{id:255099048,first_name:"Mikhail",last_name:"Tananakin",photo_medium:"https://pp.vk.me/c627420/v627420048/50bcb/Xis0dn1q1c0.jpg"},{id:215395761,first_name:"Alexandra",last_name:"Olegovna",photo_medium:"https://pp.vk.me/c624527/v624527761/4a494/5oujoa1LgBk.jpg"},{id:72487408,first_name:"Max",last_name:"Balushkin",photo_medium:"https://pp.vk.me/c626524/v626524408/3f83c/bHXTOO2YL-I.jpg"},{id:30877535,first_name:"Sveta",last_name:"Beym",photo_medium:"https://pp.vk.me/c837123/v837123535/5d69/BawWjnvMh8w.jpg"},{id:209307453,first_name:"Inna",last_name:"Lopatkina",photo_medium:"https://pp.vk.me/c638027/v638027453/c232/4bVrhS1Pks4.jpg"},{id:176220869,first_name:"Arseny",last_name:"Nazarov",photo_medium:"https://pp.vk.me/c636118/v636118869/4ccf2/oKp_-gNjeG4.jpg"},{id:172879703,first_name:"Ivan",last_name:"Gukov",photo_medium:"https://pp.vk.me/c630228/v630228703/fa0a/4kE_Kg7892g.jpg"}];data=data.concat(JSON.parse(JSON.stringify(data)));data.forEach(f => {f.id = Math.random().toString().slice(2, 5)});data=data.sortByKey('id');
+
+var fuzzy = new Fuse(data, { keys: ['first_name', 'last_name'], threshold: 0.45 });
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        search: '',
+        user_id: data[Math.random() * data.length | 0].id,
+    },
+    computed: {
+        people() {
+            let items = fuzzy.search(this.search);
+            return (items.length || this.search.length) ? items : data;
         }
-    });
-}
+    },
+    methods: {
+        goto(id) { console.log(`go to ${id}`) },
+        back()   { console.log(`back`) }
+    }
+});
 </script>
 
 </body>
