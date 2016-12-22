@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Discover</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .head {
+            max-width: 400px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 50px;
+            background: #f56a6a;
+            z-index: 9;
+            color: white;
+            font: 1rem Roboto;
+        }
+
+        .head .title {
+            font: 2rem Roboto;
+            line-height: 50px;
+            text-align: center;
+        }
+
+        .head .back {
+            position: absolute;
+            top: 0;
+            padding: 0 20px 0 15px;
+            font-size: 2.5rem;
+            line-height: 50px;
+        }
+
+        .content {
+            top: 50px;
+            position: relative;
+            font-family: 'Open Sans';
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+<div class="head">
+    <div class="back" @click="back"><i class="fa fa-angle-left"></i></div>
+    <div class="title">{{ name }}</div>
+</div>
+
+<div class="content" style="margin: 5px">
+    <div style="padding: 10px">
+        <div style="height: 300px; background-size: cover; background-repeat: no-repeat; background-position-x: 50%"
+            :style="{ 'background-image': 'url(' + image + ')' }">
+        </div>
+
+        <div style="margin-top: 0.7em; font-family: Verdana; color: #999; font-size: 1.1em">
+            <i class="fa fa-map-marker fa-lg" style="margin-right: 0.2em"></i> {{ address }}
+        </div>
+
+        <div style="margin-top: 0.7em; font-family: 'Open Sans'; text-align: justify;">
+            {{ desc }}
+        </div>
+
+        <div style="margin-top: 0.7em; float: right; background: #f56a6a; padding: 5px; color: white">
+            {{ count }} <i class="fa fa-users"></i> were here
+        </div>
+    </div>
+</div>
+
+</div>
+<script>
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        count: 32,
+        address: 'st. Bolshaya Sadovaya',
+        name: 'The Roof',
+        image: 'https://pp.vk.me/c637726/v637726637/240f3/OEnXEqk4kc4.jpg',
+        desc: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered.'
+    },
+    methods: {
+        back()   { console.log(`back`) },
+    }
+});
+
+</script>
+
+</body>
+</html>
