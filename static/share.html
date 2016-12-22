@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Discover</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/dropzone.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .head {
+            max-width: 400px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 50px;
+            background: #f56a6a;
+            z-index: 9;
+            color: white;
+            font: 1rem Roboto;
+        }
+
+        .head .title {
+            font: 2rem Roboto;
+            line-height: 50px;
+            text-align: center;
+        }
+
+        .head .back {
+            position: absolute;
+            top: 0;
+            padding: 0 20px 0 15px;
+            font-size: 2.5rem;
+            line-height: 50px;
+        }
+
+        input[type='text'] {
+            all: initial;
+            color: gray;
+            width: calc(100% - 100px);
+            height: 2rem;
+            line-height: 2rem;
+            font: 1em Verdana;
+        }
+
+        button.find {
+            all: initial;
+            color: white;
+            background: #c75656;
+            height: 2rem;
+            width: 2rem;
+            text-align: center;
+            line-height: 1.5rem;
+            /*padding: 0 0.5rem;*/
+            border-radius: 100%;
+        }
+
+        .content {
+            top: 50px;
+            position: relative;
+            font-family: 'Open Sans';
+        }
+
+        input.field {
+            color: #777;
+            width: 100%;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+<div class="head">
+    <div class="back" @click="back"><i class="fa fa-angle-left"></i></div>
+    <div class="title">Share Place</div>
+</div>
+
+<div class="content" style="margin: 5px">
+    <div class="b-dropzone" @click="openFileDialog" style="padding-top: 10px">
+        <input ref="files" type="file" accept="image/*" name="files[]" class="b-dropzone__uploader" />
+
+        <div class="dropzone">
+            <div class="dropzone-text">
+                <div class="dropzone__content">
+
+                    <i class="fa fa-file-image-o dropzone__logo"></i>
+                    <div class="dropzone__text">
+                        <div class="dropzone__title">Load files</div>
+                        <div class="dropzone__desc">Take a photo and <a class="_link">upload</a> it</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="font-size: 1.2em; padding: 10px">
+        <div style="margin-top: 1em">
+            <b style="color: #444">Name</b><br>
+            <input type="text" class="field" placeholder="Recall the most common"/>
+        </div>
+        <div style="margin-top: 1em">
+            <b style="color: #444">Description</b><br>
+            <textarea type="text" placeholder="Why do you love it?" rows="5"
+                    style="reset: all; box-sizing: border-box; font-size: inherit; border: none;
+                            border-bottom: 1px solid #ccc; width: 100%; line-height: 2rem;
+                            font: 1em Verdana; outline: none; resize: none; color: #777"></textarea>
+        </div>
+        <div style="margin-top: 1em; color: #888" v-if="coords">
+            <b style="color: #444">GPS</b><br>
+            <span style="font-family: Verdana">
+                ({{ coords.latitude | toDMS }}, {{ coords.longitude | toDMS(true) }})
+            </span>
+        </div>
+    </div>
+</div>
+
+</div>
+<script>
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        coords: false
+    },
+    methods: {
+        back()   { console.log(`back`) },
+
+        openFileDialog() {
+            this.$refs.files.click();
+        },
+
+        uploadFile() {
+            // this.$refs.value = '';
+        }
+    },
+    filters: {
+        toDMS(D, lng = false) {
+            let dir = D < 0 ? lng ? 'W' : 'S' : lng ? 'E' : 'N',
+                deg = 0 | (D < 0 ? D = -D : D),
+                min = 0 | D % 1 * 60,
+                sec = (0 | D * 60 % 1 * 6000) / 100;
+            return `${dir} ${deg}° ${min}' ${sec}''`;
+        }
+    }
+});
+
+
+navigator.geolocation.getCurrentPosition(
+    pos => app.coords = pos.coords,
+    e => alert(`Can't get location, ${e.message.toLowerCase()}`),
+    { enableHighAccuracy: true, timeout: 10000 }
+);
+
+</script>
+
+</body>
+</html>
