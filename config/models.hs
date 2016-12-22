@@ -36,7 +36,7 @@ Discovery json
 
 UserAuthData json
     user UserId
-    token Text
+    -- token VkAuth
     deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

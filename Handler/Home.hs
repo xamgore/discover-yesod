@@ -13,12 +13,17 @@ import qualified Data.Yaml             as Yaml
 import           Data.Aeson
 import           Data.Aeson.Encode (encodeToTextBuilder)
 import           Network.HTTP.Simple
+-- import Vk
 -- https://haskell-lang.org/library/http-client
 -- https://vk.com/dev/authcode_flow_user
-
-
 data VkAuth = VkAuth { access_token :: String, expires_in :: Int, user_id :: Int } deriving (Generic, Show)
 instance FromJSON VkAuth
+
+
+vkapi :: Int -> String -> String -> String -> String
+vkapi client secret back code =
+    "https://oauth.vk.com/access_token?client_id=" ++ show client ++
+    "&client_secret=" ++ secret ++ "&redirect_uri=" ++ back ++ "&code=" ++ code
 
 
 getHomeR :: Handler ()
@@ -51,6 +56,12 @@ authorizeUser = do
             sendFile "text/html" "static/index.html"
 
 
+
+
+valToText :: Value -> Text
+valToText = TL.toStrict . toLazyText . encodeToTextBuilder
+
+
 getVkAuthToken :: String -> IO (Result VkAuth)
 getVkAuthToken url = do
     request  <- parseRequest $ "GET " ++ url
@@ -71,11 +82,3 @@ getFriends vkAuth = do
 
     return (valToText body)
 
-
-vkapi :: Int -> String -> String -> String -> String
-vkapi client secret back code =
-    "https://oauth.vk.com/access_token?client_id=" ++ show client ++
-    "&client_secret=" ++ secret ++ "&redirect_uri=" ++ back ++ "&code=" ++ code
-
-valToText :: Value -> Text
-valToText = TL.toStrict . toLazyText . encodeToTextBuilder
