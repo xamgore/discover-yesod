@@ -111,22 +111,30 @@ postPlacesPhotosR placeId = do
     insertedPhoto <- runDB $ insertEntity photo
     returnJson insertedPhoto
 
+data Person =
+  Person { firstName  :: !Text
+         , lastName   :: !Text
+         , age        :: Int
+         , likesPizza :: Bool
+           } deriving Show
+
 getLeaderboardR :: Handler Value
 getLeaderboardR = do
     maybeUserId <- lookupCookie "user_id"
     case (maybeUserId >>= textToSqlKey) :: Maybe UserId of 
         Just id -> do
             user <- runDB $ get404 id
-            request  <- parseRequest $ 
-                            "GET https://api.vk.com/method/friends.get?user_id=" ++ show id ++
-                            "&order=hints&count=10&offset=0&fields=uid,first_name,last_name,photo_medium&access_token=" ++ show id --(token user)
-            response <- httpJSON request
+            let UserKey {unUserKey = SqlBackendKey {unSqlBackendKey = uid}} = id
+                in do
+                    request  <- parseRequest $ 
+                                    "GET https://api.vk.com/method/friends.get?user_id=" ++ show uid ++
+                                    "&fields=uid,first_name,last_name,photo_medium&access_token=" ++ userToken user
+                    response <- httpJSON request
 
-            let body  = getResponseBody response :: Value
-            returnJson body
+                    let body  = getResponseBody response :: Value
+                    returnJson body
             -- let body  = getResponseBody response :: Value
             -- select $ from $ \user -> do
             --         where_ $ user ^. UserId in_ valList body
             --         return user
-            sendResponseStatus status401 (TypedContent "text/html" "401 Unauthorized")
         Nothing -> sendResponseStatus status401 (TypedContent "text/html" "401 Unauthorized")
