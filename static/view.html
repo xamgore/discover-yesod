@@ -101,23 +101,24 @@ var app = new Vue({
         desc: ''
     },
     methods: {
-        back()   { console.log(`back`) },
+        back()   { window.history.back() },
     }
 });
 
 
 function getData() {
-    fetch(`/api/places/${document.location.pathname.slice(1)}`, { method: 'GET' })
+    fetch(`/api/places/${document.location.pathname.split('/')[2]}`, { method: 'GET' })
         .then(res => {
             if (!res.ok) return console.log('Network error') || setTimeout(getData, 1000);
 
             res.json().then(res => {
                 app.$data.name  = res.name;
                 app.$data.desc  = res.desc;
-                app.$data.image = res.img;
-                app.$mount('#app');
+                app.$data.image = res.img   || '';
+                app.$data.count = res.count || false;
+                // app.$mount('#app');
 
-                return fetch(`/https://maps.googleapis.com/maps/api/geocode/json?latlng=${res.x},${res.y}&sensor=true`);
+                return fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${res.x},${res.y}&sensor=true`);
             }).then(goo => goo.json())
               .then(goo => {
                   let addr = goo.results[0].address_components;
