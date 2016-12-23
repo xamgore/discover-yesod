@@ -16,3 +16,5 @@
 /discoveries/#DiscoveryId DiscoveryR GET
 
 /places/#PlaceId/photos PlacesPhotosR GET POST
+
+/leaderboard LeaderboardR GET

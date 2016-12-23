@@ -18,7 +18,12 @@ import Data.Aeson.Types ()
 import Data.Text.Read
 import Text.Read
 import qualified Database.Esqueleto      as E
-import           Database.Esqueleto      ((^.))
+import           Database.Esqueleto      ((^.), select, from, in_, where_, valList)
+import           Web.Cookie
+import           Network.HTTP.Simple
+
+
+
 
 getEntity entityId = do
     entity <- runDB $ get404 entityId
@@ -106,3 +111,26 @@ postPlacesPhotosR placeId = do
     insertedPhoto <- runDB $ insertEntity photo
     returnJson insertedPhoto
 
+-- getAccessToken :: UserId -> Handler (Maybe String)
+-- getAccessToken uid = let authData = getEntity uid in do
+
+getLeaderboardR :: Handler Value
+getLeaderboardR = do
+    maybeUserId <- lookupCookie "user_id"
+    case maybeUserId of
+        Just id -> do
+            -- maybeToken <- runDB $ get404 id
+            -- case maybeToken of
+            --     Just token -> do
+            --         request  <- parseRequest $ 
+            --                         "GET https://api.vk.com/method/friends.get?user_id=" ++ (unpack id) ++
+            --                         "&order=hints&count=10&offset=0&fields=uid,first_name,last_name,photo_medium&access_token=" ++ token
+            --         response <- httpJSON request
+            --         returnJson response
+            --         -- let body  = getResponseBody response :: Value
+            --         -- select $ from $ \user -> do
+            --         --         where_ $ user ^. UserId in_ valList body
+            --         --         return user
+            --     Nothing -> sendResponseStatus status403 (TypedContent "text/html" "403 Forbidden")
+            sendResponseStatus status401 (TypedContent "text/html" "401 Unauthorized")
+        Nothing -> sendResponseStatus status401 (TypedContent "text/html" "401 Unauthorized")

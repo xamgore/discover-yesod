@@ -14,7 +14,7 @@ import           Data.Aeson
 import           Data.Aeson.Encode (encodeToTextBuilder)
 import           Network.HTTP.Simple
 import Database.Persist.Sqlite
--- import Vk
+
 -- https://haskell-lang.org/library/http-client
 -- https://vk.com/dev/authcode_flow_user
 data VkAuth = VkAuth { access_token :: String, expires_in :: Int, user_id :: Int } deriving (Generic, Show)
