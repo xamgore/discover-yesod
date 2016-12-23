@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Discover</title>
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/2.5.0/fuse.min.js"></script>
@@ -145,40 +145,33 @@
     </div>
 
     <div class="content">
-        <div>
+        <div v-if="people.length">
             <div class="item" :class="{ you: man.id == user_id }" v-for="man in people" @click="goto(man.id)">
                 <img :src="man.photo_medium" alt="">
-                <span class="points">{{ man.id }}</span>
+                <span class="points">{{ man.discoveries }}</span>
                 <span class="name">{{ man.first_name }} {{ man.last_name }}</span>
             </div>
+        </div>
+        <div v-else style="text-align:center; margin-top:4em; color: #ccc">
+            <i class="fa fa-circle-o-notch fa-spin fa-2x" aria-hidden="true"></i>
         </div>
     </div>
 </div>
 
 <script>
 
-Array.prototype.sortByKey = function (key) {
-    const compare = function(a, b) {
-        var x = a[key]; var y = b[key];
-        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
-    }
-    return this.sort(compare);
-}
-
-var data=[{id:475146,first_name:"Andrey",last_name:"Sitnik",photo_medium:"https://pp.vk.me/c630429/v630429146/4a468/H8xYH6B9l-c.jpg"},{id:12605637,first_name:"Vsevolod",last_name:"Kvachev",photo_medium:"https://pp.vk.me/c631121/v631121637/463d8/WR0E9hSbi-c.jpg"},{id:18112620,first_name:"Natasha",last_name:"Senchenko",photo_medium:"https://pp.vk.me/c408726/v408726620/a13b/2SCVaEja_6c.jpg"},{id:255099048,first_name:"Mikhail",last_name:"Tananakin",photo_medium:"https://pp.vk.me/c627420/v627420048/50bcb/Xis0dn1q1c0.jpg"},{id:215395761,first_name:"Alexandra",last_name:"Olegovna",photo_medium:"https://pp.vk.me/c624527/v624527761/4a494/5oujoa1LgBk.jpg"},{id:72487408,first_name:"Max",last_name:"Balushkin",photo_medium:"https://pp.vk.me/c626524/v626524408/3f83c/bHXTOO2YL-I.jpg"},{id:30877535,first_name:"Sveta",last_name:"Beym",photo_medium:"https://pp.vk.me/c837123/v837123535/5d69/BawWjnvMh8w.jpg"},{id:209307453,first_name:"Inna",last_name:"Lopatkina",photo_medium:"https://pp.vk.me/c638027/v638027453/c232/4bVrhS1Pks4.jpg"},{id:176220869,first_name:"Arseny",last_name:"Nazarov",photo_medium:"https://pp.vk.me/c636118/v636118869/4ccf2/oKp_-gNjeG4.jpg"},{id:172879703,first_name:"Ivan",last_name:"Gukov",photo_medium:"https://pp.vk.me/c630228/v630228703/fa0a/4kE_Kg7892g.jpg"}];data=data.concat(JSON.parse(JSON.stringify(data)));data.forEach(f => {f.id = Math.random().toString().slice(2, 5)});data=data.sortByKey('id');
-
-var fuzzy = new Fuse(data, { keys: ['first_name', 'last_name'], threshold: 0.45 });
-
 var app = new Vue({
     el: '#app',
     data: {
         search: '',
-        user_id: data[Math.random() * data.length | 0].id,
+        friends: [],
+        fuzzy: false,
+        user_id: getCookie('user_id')
     },
     computed: {
         people() {
-            let items = fuzzy.search(this.search);
-            return (items.length || this.search.length) ? items : data;
+            let items = this.fuzzy ? this.fuzzy.search(this.search) : [];
+            return (items.length || this.search.length) ? items : this.friends;
         }
     },
     methods: {
@@ -186,6 +179,24 @@ var app = new Vue({
         back()   { console.log(`back`) }
     }
 });
+
+
+function getCookie(name) {
+    let value = "; " + document.cookie,
+        parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
+fetch('/api/leaderboard', { method: 'GET' })
+    .then(res => {
+        if (!res.ok) return console.log('Network error');
+
+        res.json().then(res => {
+            app.$data.friends = res;
+            app.$data.fuzzy   = new Fuse(res, { keys: ['first_name', 'last_name'], threshold: 0.45 });
+            app.$mount('#app');
+        })
+    });
 </script>
 
 </body>
