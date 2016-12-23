@@ -13,6 +13,7 @@ import qualified Data.Yaml             as Yaml
 import           Data.Aeson
 import           Data.Aeson.Encode (encodeToTextBuilder)
 import           Network.HTTP.Simple
+import Database.Persist.Sqlite
 -- import Vk
 -- https://haskell-lang.org/library/http-client
 -- https://vk.com/dev/authcode_flow_user
@@ -34,6 +35,14 @@ getHomeR = do
         Just uid -> sendFile "text/html" "static/index.html"
         Nothing  -> authorizeUser
 
+toUserId :: VkAuth -> UserId
+toUserId = toSqlKey . fromIntegral . user_id
+
+saveUser :: VkAuth -> Handler ()
+saveUser vk = do
+    runDB $ deleteWhere [UserId ==. toUserId vk]
+    runDB $ insert (UserAuthData (toUserId vk) (access_token vk))
+    return ()
 
 authorizeUser :: Handler ()
 authorizeUser = do
@@ -48,8 +57,9 @@ authorizeUser = do
             vkRes <- liftIO $ getVkAuthToken url
 
             case vkRes of
-                Success vk ->
+                Success vk -> do
                     setCookie $ def { setCookieName = "user_id", setCookieValue = S8.pack $ show $ user_id vk }
+                    saveUser vk
                 _ ->
                     deleteCookie "user_id" ""
 

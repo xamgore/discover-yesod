@@ -1,8 +1,4 @@
 User json
-    ident Text
-    password Text Maybe
-    UniqueUser ident
-    deriving Typeable
     deriving Show
 
 Email
@@ -36,7 +32,7 @@ Discovery json
 
 UserAuthData json
     user UserId
-    -- token VkAuth
+    token String
     deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

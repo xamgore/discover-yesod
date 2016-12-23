@@ -35,6 +35,8 @@ stanzas:
 
   # Static files.
   - type: static-files
+    ssl: true
+    requires-secure: true
     hosts:
       - static.discover-yesod.com
     root: ../static
@@ -44,6 +46,8 @@ stanzas:
 
   # Redirect plain domain name to www.
   - type: redirect
+    ssl: true
+    requires-secure: true
 
     hosts:
       - discover-yesod.com
