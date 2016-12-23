@@ -24,7 +24,7 @@ instance FromJSON VkAuth
 vkapi :: Int -> String -> String -> String -> String
 vkapi client secret back code =
     "https://oauth.vk.com/access_token?client_id=" ++ show client ++
-    "&client_secret=" ++ secret ++ "&redirect_uri=" ++ back ++ "&code=" ++ code
+    "&client_secret=" ++ secret ++ "&redirect_uri=https://" ++ back ++ "&code=" ++ code
 
 
 getHomeR :: Handler ()
@@ -32,7 +32,7 @@ getHomeR = do
     maybeUserId <- lookupCookie "user_id"
 
     case maybeUserId of
-        Just uid -> sendFile "text/html" "static/index.html"
+        Just _   -> sendFile "text/html" "static/view.html"
         Nothing  -> authorizeUser
 
 toUserId :: VkAuth -> UserId
@@ -63,7 +63,7 @@ authorizeUser = do
                 _ ->
                     deleteCookie "user_id" ""
 
-            sendFile "text/html" "static/index.html"
+            redirect HomeR
 
 
 
@@ -91,4 +91,3 @@ getFriends vkAuth = do
     let body  = getResponseBody response :: Value
 
     return (valToText body)
-
