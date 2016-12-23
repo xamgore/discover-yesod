@@ -81,6 +81,27 @@
             box-sizing: border-box;
             border-bottom: 1px solid #ccc;
         }
+
+        textarea.field {
+            reset: all;
+            box-sizing: border-box;
+            font-size: inherit;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            width: 100%;
+            line-height: 2rem;
+            font: 1em Verdana;
+            outline: none;
+            resize: none;
+            color: #777;
+        }
+
+        span.send {
+            background: #f56a6a;
+            border-radius: 3px;
+            color: white;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
@@ -112,20 +133,20 @@
     <div style="font-size: 1.2em; padding: 10px">
         <div style="margin-top: 1em">
             <b style="color: #444">Name</b><br>
-            <input type="text" class="field" placeholder="Recall the most common"/>
+            <input type="text" v-model="name" class="field" placeholder="Recall the most common"/>
         </div>
         <div style="margin-top: 1em">
             <b style="color: #444">Description</b><br>
-            <textarea type="text" placeholder="Why do you love it?" rows="5"
-                    style="reset: all; box-sizing: border-box; font-size: inherit; border: none;
-                            border-bottom: 1px solid #ccc; width: 100%; line-height: 2rem;
-                            font: 1em Verdana; outline: none; resize: none; color: #777"></textarea>
+            <textarea type="text" v-model="desc" class="field" placeholder="Why do you love it?" rows="4"></textarea>
         </div>
-        <div style="margin-top: 1em; color: #888" v-if="coords">
+        <div style="margin-top: 1em; color: #888" :style="{ visibility: coords ? 'visible' : 'hidden' }">
             <b style="color: #444">GPS</b><br>
             <span style="font-family: Verdana">
                 ({{ coords.latitude | toDMS }}, {{ coords.longitude | toDMS(true) }})
             </span>
+        </div>
+        <div style="margin: 1em 0 0; display: flex; justify-content: center">
+            <span @click="uploadFile" class="send">Ok, share!</span>
         </div>
     </div>
 </div>
@@ -136,7 +157,9 @@
 var app = new Vue({
     el: '#app',
     data: {
-        coords: false
+        coords: false,
+        name: '',
+        desc: ''
     },
     methods: {
         back()   { console.log(`back`) },
@@ -146,6 +169,18 @@ var app = new Vue({
         },
 
         uploadFile() {
+            let form = new FormData();
+
+            Object.entries({
+                file:      this.$refs.files[0],
+                name:      this.name,
+                desc:      this.desc,
+                latitude:  this.coords.latitude,
+                longitude: this.coords.longitude
+            }).forEach((k, v) => form.append(k, v));
+
+            fetch('/api/places', { method: 'POST', body: form });
+            // TODO: turn off the button
             // this.$refs.value = '';
         }
     },
@@ -163,8 +198,7 @@ var app = new Vue({
 
 navigator.geolocation.getCurrentPosition(
     pos => app.coords = pos.coords,
-    e => alert(`Can't get location, ${e.message.toLowerCase()}`),
-    { enableHighAccuracy: true, timeout: 10000 }
+    e => alert(`Can't get location, ${e.message.toLowerCase()} :(`)
 );
 
 </script>
