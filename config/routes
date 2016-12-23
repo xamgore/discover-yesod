@@ -23,6 +23,8 @@
 
 /users/#Int PageUserR GET
 
+/share PageShareR GET
+
 /leaderboard PageLeaderboardR GET
 
 / HomeR GET

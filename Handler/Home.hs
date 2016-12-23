@@ -27,23 +27,31 @@ vkapi client secret back code =
     "&client_secret=" ++ secret ++ "&redirect_uri=https://" ++ back ++ "&code=" ++ code
 
 
-
-getPagePlaceR :: Int -> Handler ()
-getPagePlaceR _ = sendFile "text/html" "static/view.html"
-
-getPageLeaderboardR :: Handler ()
-getPageLeaderboardR = sendFile "text/html" "static/index.html"
-
-getPageUserR :: Int -> Handler ()
-getPageUserR _ = sendFile "text/html" "static/user.html"
-
-getHomeR :: Handler ()
-getHomeR = do
+checkAuthCookie :: HandlerT App IO () -> HandlerT App IO ()
+checkAuthCookie continue = do
     maybeUserId <- lookupCookie "user_id"
 
     case maybeUserId of
-        Just _   -> sendFile "text/html" "static/view.html"
+        Just _   -> continue
         Nothing  -> authorizeUser
+
+
+getPagePlaceR :: Int -> Handler ()
+getPagePlaceR _ = checkAuthCookie $ sendFile "text/html" "static/view.html"
+
+getPageUserR :: Int -> Handler ()
+getPageUserR _ = checkAuthCookie $ sendFile "text/html" "static/user.html"
+
+getPageLeaderboardR :: Handler ()
+getPageLeaderboardR = checkAuthCookie $ sendFile "text/html" "static/index.html"
+
+getPageShareR :: Handler ()
+getPageShareR = checkAuthCookie $ sendFile "text/html" "static/share.html"
+
+getHomeR :: Handler ()
+getHomeR = checkAuthCookie $ sendFile "text/html" "static/map.html"
+
+
 
 toUserId :: VkAuth -> UserId
 toUserId = toSqlKey . fromIntegral . user_id
@@ -70,8 +78,10 @@ authorizeUser = do
                     saveUser vk
                 _ ->
                     deleteCookie "user_id" ""
+                    -- TODO database changes
 
-            redirect HomeR
+            (Just thisRoute) <- getCurrentRoute
+            redirect thisRoute
 
 
 
