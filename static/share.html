@@ -179,7 +179,10 @@ var app = new Vue({
                 longitude: this.coords.longitude
             }).forEach((k, v) => form.append(k, v));
 
-            fetch('/api/places', { method: 'POST', body: form });
+            fetch('/api/places', { method: 'POST', body: form })
+                .then(res => console.log('sent!') || window.history.back())
+                .catch(err => console.log(err));
+                
             // TODO: turn off the button
             // this.$refs.value = '';
         }
