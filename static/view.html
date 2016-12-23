@@ -74,15 +74,15 @@
     </div>
 
     <div style="padding: 10px">
-        <div style="margin-top: 0.7em; font-family: Verdana; color: #999; font-size: 1.1em">
+        <div v-show="address" style="margin-top: 0.7em; font-family: Verdana; color: #999; font-size: 1.1em">
             <i class="fa fa-map-marker fa-lg" style="margin-right: 0.2em"></i> {{ address }}
         </div>
 
-        <div style="margin-top: 0.7em; font-family: 'Open Sans'; text-align: justify;">
+        <div v-show="desc" style="margin-top: 0.7em; font-family: 'Open Sans'; text-align: justify;">
             {{ desc }}
         </div>
 
-        <div style="margin-top: 0.7em; float: right; background: #f56a6a; padding: 5px; color: white">
+        <div v-show="count" style="margin-top: 0.7em; float: right; background: #f56a6a; padding: 5px; color: white">
             {{ count }} <i class="fa fa-users"></i> were here
         </div>
     </div>
@@ -94,16 +94,39 @@
 var app = new Vue({
     el: '#app',
     data: {
-        count: 32,
-        address: 'st. Bolshaya Sadovaya',
-        name: 'The Roof',
-        image: 'https://pp.vk.me/c637726/v637726637/240f3/OEnXEqk4kc4.jpg',
-        desc: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered.'
+        count: false,
+        address: '',
+        name: '',
+        image: '',
+        desc: ''
     },
     methods: {
         back()   { console.log(`back`) },
     }
 });
+
+
+function getData() {
+    fetch(`/api/places/${document.location.pathname.slice(1)}`, { method: 'GET' })
+        .then(res => {
+            if (!res.ok) return console.log('Network error') || setTimeout(getData, 1000);
+
+            res.json().then(res => {
+                app.$data.name  = res.name;
+                app.$data.desc  = res.desc;
+                app.$data.image = res.img;
+                app.$mount('#app');
+
+                return fetch(`/https://maps.googleapis.com/maps/api/geocode/json?latlng=${res.x},${res.y}&sensor=true`);
+            }).then(goo => goo.json())
+              .then(goo => {
+                  let addr = goo.results[0].address_components;
+                  app.$data.address = `${addr[1].short_name}, ${addr[0].short_name}`;
+              })
+        });
+}
+
+getData();
 
 </script>
 
