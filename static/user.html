@@ -105,12 +105,12 @@
 
 <div class="content" style="margin: 5px">
     <div style="padding: 0 10px">
-        <a :href="'vk.com/id' + id" style="text-decoration: none; color: #555; font-size: 1.4em">
+        <a v-show="name" :href="'vk.com/id' + id" style="text-decoration: none; color: #555; font-size: 1.4em">
             <i class="fa fa-vk"></i>
             <span style="text-decoration: underline">{{ name }}</span>
         </a>
 
-        <div class="grid">
+        <div class="grid" v-if="places.length">
             <a v-for="place in places" :href="place.link">
                 <figure>
                   <img :src="place.img" alt="">
@@ -127,39 +127,30 @@
 var app = new Vue({
     el: '#app',
     data: {
-        name: 'Nikita Chaykin',
-        id: 28420405,
-        places: [ {
-                'name': 'The Roof',
-                'img': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg',
-                'link': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg'
-            },
-            {
-                    'name': 'The Roof',
-                    'img': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg',
-                    'link': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg'
-            },
-            {
-                    'name': 'The Roof',
-                    'img': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg',
-                    'link': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg'
-            },
-            {
-                    'name': 'The Roof',
-                    'img': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg',
-                    'link': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg'
-            },
-            {
-                    'name': 'The Roof',
-                    'img': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg',
-                    'link': 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/placeimg01.jpg'
-            },
-        ]
+        name: '',
+        id: document.location.pathname.split('/')[2],
+        places: []
     },
     methods: {
-        back()   { console.log(`back`) },
+        back()   { window.history.back() },
     }
 });
+
+
+function getData() {
+    fetch(`/api/users/${app.$data.id}`, { method: 'GET' })
+        .then(res => {
+            if (!res.ok) return console.log('Network error') || setTimeout(getData, 1000);
+
+            res.json().then(res => {
+                app.$data.name   = res.name;
+                app.$data.places = res.places || [];
+                // id // name // img // link
+            })
+        });
+}
+
+getData();
 
 </script>
 

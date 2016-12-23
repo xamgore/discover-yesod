@@ -162,7 +162,7 @@ var app = new Vue({
         desc: ''
     },
     methods: {
-        back()   { console.log(`back`) },
+        back()   { window.history.back() },
 
         openFileDialog() {
             this.$refs.files.click();

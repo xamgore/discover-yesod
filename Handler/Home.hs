@@ -27,6 +27,16 @@ vkapi client secret back code =
     "&client_secret=" ++ secret ++ "&redirect_uri=https://" ++ back ++ "&code=" ++ code
 
 
+
+getPagePlaceR :: Int -> Handler ()
+getPagePlaceR _ = sendFile "text/html" "static/view.html"
+
+getPageLeaderboardR :: Handler ()
+getPageLeaderboardR = sendFile "text/html" "static/index.html"
+
+getPageUserR :: Int -> Handler ()
+getPageUserR _ = sendFile "text/html" "static/user.html"
+
 getHomeR :: Handler ()
 getHomeR = do
     maybeUserId <- lookupCookie "user_id"

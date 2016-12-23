@@ -175,8 +175,8 @@ var app = new Vue({
         }
     },
     methods: {
-        goto(id) { console.log(`go to ${id}`) },
-        back()   { console.log(`back`) }
+        goto(id) { document.location.pathname = `/user/${id}` },
+        back()   { window.history.back() }
     }
 });
 
@@ -195,7 +195,7 @@ function getData() {
             res.json().then(res => {
                 app.$data.friends = res;
                 app.$data.fuzzy   = new Fuse(res, { keys: ['first_name', 'last_name'], threshold: 0.45 });
-                app.$mount('#app');
+                // app.$mount('#app');
             })
         });
 }

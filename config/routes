@@ -19,4 +19,10 @@
 /api/leaderboard LeaderboardR GET
 
 
+/places/#Int PagePlaceR GET
+
+/users/#Int PageUserR GET
+
+/leaderboard PageLeaderboardR GET
+
 / HomeR GET
