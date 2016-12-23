@@ -18,6 +18,7 @@ Place json
     name Text
     x Double
     y Double
+    desc Text
     deriving Show
 
 Photo json
