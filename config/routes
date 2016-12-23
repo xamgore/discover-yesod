@@ -1,11 +1,10 @@
 /favicon.ico FaviconR GET
 /static StaticR Static appStatic
-/auth   AuthR   Auth   getAuth
 
 / HomeR GET
 
 /users UsersR GET
-    
+
 /users/#UserId UserR GET
 
 /places PlacesR GET POST
@@ -17,4 +16,3 @@
 /discoveries/#DiscoveryId DiscoveryR GET
 
 /places/#PlaceId/photos PlacesPhotosR GET POST
-
