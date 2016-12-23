@@ -40,9 +40,7 @@ toUserId = toSqlKey . fromIntegral . user_id
 
 saveUser :: VkAuth -> Handler ()
 saveUser vk = do
-    runDB $ deleteWhere [UserId ==. toUserId vk]
-    runDB $ insert (UserAuthData (toUserId vk) (access_token vk))
-    return ()
+    runDB $ repsert (toUserId vk) (User (access_token vk))
 
 authorizeUser :: Handler ()
 authorizeUser = do

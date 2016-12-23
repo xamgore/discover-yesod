@@ -1,4 +1,5 @@
 User json
+    token String
     deriving Show
 
 Email
@@ -28,11 +29,6 @@ Discovery json
     user UserId
     place PlaceId
     time Text
-    deriving Show
-
-UserAuthData json
-    user UserId
-    token String
     deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)
