@@ -1,20 +1,22 @@
 /favicon.ico FaviconR GET
 /static StaticR Static appStatic
 
+
+/api/users UsersR GET
+
+/api/users/#UserId UserR GET
+
+/api/places PlacesR GET POST
+
+/api/places/#PlaceId PlaceR GET
+
+/api/discoveries DiscoveriesR GET POST
+
+/api/discoveries/#DiscoveryId DiscoveryR GET
+
+/api/places/#PlaceId/photos PlacesPhotosR GET POST
+
+/api/leaderboard LeaderboardR GET
+
+
 / HomeR GET
-
-/users UsersR GET
-
-/users/#UserId UserR GET
-
-/places PlacesR GET POST
-
-/places/#PlaceId PlaceR GET
-
-/discoveries DiscoveriesR GET POST
-
-/discoveries/#DiscoveryId DiscoveryR GET
-
-/places/#PlaceId/photos PlacesPhotosR GET POST
-
-/leaderboard LeaderboardR GET
