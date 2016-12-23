@@ -54,15 +54,28 @@ HOST: http://polls.apiblueprint.org/
 
 ### Upload a Photo [POST]
 
+## Leaderboard [/leaderboard]
+
+### Get Leaderboard
+
++ Response 200 (application/json)
+    + Attributes (User)
+
+### 
+
 # Data Structures
 
 ## User Base (object)
 
-+ id: "66d68fc0-1be0-41a7-8497-d77a2d7e2805" (string)
++ id: "66268" (number)
 
-+ name: "Jane Doe" (string)
++ first_name: "Jane" (string)
 
-    Name
++ last_name: "Doe" (string)
+
++ photo_medium: "http://localhost" (string)
+
++ discoveries: 0 (number)
 
 ## Place Base (object)
 
@@ -96,3 +109,6 @@ HOST: http://polls.apiblueprint.org/
 + time: "2012-04-23T18:25:43.511Z" (string)
 
     Datetime in iso 8601 format when the place was discovered
+
+
+
