@@ -89,9 +89,9 @@ getTables = do
 --         setUrl $ AuthR $ PluginR "dummy" []
 
 -- | Create a user.
-createUser :: Text -> YesodExample App (Entity User)
-createUser ident = do
-    runDB $ insertEntity User
-        { userIdent = ident
-        , userPassword = Nothing
-        }
+-- createUser :: Text -> YesodExample App (Entity User)
+-- createUser ident = do
+--     runDB $ insertEntity User
+--         { userIdent = ident
+--         , userPassword = Nothing
+--         }
