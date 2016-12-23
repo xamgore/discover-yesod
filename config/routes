@@ -4,10 +4,6 @@
 
 / HomeR GET
 
-/comments CommentR GET POST
-
-/json JsonR GET
-
 /users UsersR GET
     
 /users/#UserId UserR GET

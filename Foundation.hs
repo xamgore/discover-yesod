@@ -81,11 +81,6 @@ instance Yesod App where
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
-    -- The page to be redirected to when authentication is required.
-    authRoute _ = Just $ AuthR LoginR
-
-    -- Routes not requiring authentication.
-    isAuthorized _ _   = return Authorized
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -115,6 +110,24 @@ instance Yesod App where
 
     makeLogger = return . appLogger
 
+instance YesodAuth App where
+    type AuthId App = UserId
+
+    -- Where to send a user after successful login
+    loginDest _ = HomeR
+    -- Where to send a user after logout
+    logoutDest _ = HomeR
+    -- Override the above two destinations when a Referer: header is present
+    redirectToReferer _ = True
+
+    authenticate creds = return $ Authenticated uid
+
+    -- You can add other plugins like Google Email, email or OAuth here
+    authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
+        -- Enable authDummy login if enabled.
+        where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
+
+    authHttpManager = getHttpManager
 
 -- How to run database actions.
 instance YesodPersist App where
@@ -125,38 +138,7 @@ instance YesodPersist App where
 instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner appConnPool
 
-instance YesodAuth App where
-    type AuthId App = UserId
 
-    -- Where to send a user after successful login
-    loginDest _ = HomeR
-    -- Where to send a user after logout
-    logoutDest _ = HomeR
-    -- Override the above two destinations when a Referer: header is present
-    -- redirectToReferer _ = True
-
-    -- authenticate creds = runDB $ do
-    --     x <- getBy $ UniqueUser $ credsIdent creds
-    --     case x of
-    --         Just (Entity uid _) -> return $ Authenticated uid
-    --         Nothing -> Authenticated <$> insert User
-
-    -- -- You can add other plugins like Google Email, email or OAuth here
-    -- authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
-    --     -- Enable authDummy login if enabled.
-    --     where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
-
-    authHttpManager = getHttpManager
-
--- | Access function to determine if a user is logged in.
-isAuthenticated :: Handler AuthResult
-isAuthenticated = do
-    muid <- maybeAuthId
-    return $ case muid of
-        Nothing -> Unauthorized "You must login to access this page"
-        Just _ -> Authorized
-
-instance YesodAuthPersist App
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
