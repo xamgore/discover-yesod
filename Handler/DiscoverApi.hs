@@ -16,7 +16,7 @@ import Database.Persist.Sqlite
 import GHC.Generics ()
 import Data.Aeson.Encode (encodeToTextBuilder)
 import Data.Aeson 
-import Data.Aeson.Types ()
+import Data.Aeson.Types
 import Data.Text.Read
 import Text.Read
 import qualified Data.ByteString.Char8 as S8
@@ -111,19 +111,16 @@ postPlacesR = do
     yMaybe <- lookupFile "y"
     case (contentsMaybe, fileMaybe, descMaybe, xMaybe, yMaybe) of
         (Just contents, Just file, Just desc, Just x, Just y) -> do
-            -- sendResponseStatus status400 "400 Bad Request"
-            -- returnJson ()    
-            let place = (Place "a" 1.0 1.0 "a" "a")
+            path <- writeToServer contents
+            let place = (Place "a" --()
+                               2.3 --()
+                               3.3 --()
+                               "b" --()
+                               (pack path))
             insertedPlace <- runDB $ insertEntity place
             returnJson insertedPlace
         otherwise -> do
-            -- sendResponseStatus status400 "400 Bad Request"
-            -- returnJson ()
-            place <- (requireJsonBody :: Handler Place)
-            insertedPlace <- runDB $ insertEntity place
-            returnJson insertedPlace    -- print (show $ fileSource file)
-    -- case file of
-    --     Just meta -> print meta --returnJson (fileSource meta)
+            sendResponseStatus status400 emptyObject
 
 imageFilePath :: String -> FilePath
 imageFilePath f = uploadDirectory </> f
