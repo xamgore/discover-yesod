@@ -71,23 +71,21 @@ getPlacesR = do
                           options :: [SelectOpt Place]
                           options = pageOptions pageSizeMaybe pageNumberMaybe
                        in selectList [] options
-    -- returnJson places
+    returnJson places
 
 
-    returnJson [
-        (Place "Мехмат" 47.216674 39.628794 "Институт математики, механики и компьютерных наук им. Воровича" 
-               "https://upload.wikimedia.org/wikipedia/commons/9/9a/%D0%A4%D0%B0%D0%BA%D1%83%D0%BB%D1%8C%D1%82%D0%B5%D1%82_%D0%BC%D0%B0%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B8,_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%BA%D0%B8_%D0%B8_%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%BD%D1%8B%D1%85_%D0%BD%D0%B0%D1%83%D0%BA_%D0%AE%D0%A4%D0%A3.jpg"),
-        (Place "Общежитие ЮФУ" 47.215548 39.636154 "Общежитие Южного Федерального Университета" 
-               "http://affiche.ru/wall/siniy_tron_wallpapers.jpg")
-        (Place "Покровский сквер" 47.225747 39.732361 "Покровский сквер Ростова-на-Дону" 
-               "http://autotravel.ru/phalbum/10133/11.jpg")
-        -- (Place "Общежитие ЮФУ" 47.215548 39.636154 "Общежитие Южного Федерального Университета" 
-        --        "http://affiche.ru/wall/siniy_tron_wallpapers.jpg")
-        -- (Place "Общежитие ЮФУ" 47.215548 39.636154 "Общежитие Южного Федерального Университета" 
-        --        "http://affiche.ru/wall/siniy_tron_wallpapers.jpg")
-        -- (Place "Общежитие ЮФУ" 47.215548 39.636154 "Общежитие Южного Федерального Университета" 
-        --        "http://affiche.ru/wall/siniy_tron_wallpapers.jpg")
-        ]
+    -- returnJson [
+    --     (Place "Мехмат" 47.216674 39.628794 "Институт математики, механики и компьютерных наук им. Воровича" 
+    --            "https://upload.wikimedia.org/wikipedia/commons/9/9a/%D0%A4%D0%B0%D0%BA%D1%83%D0%BB%D1%8C%D1%82%D0%B5%D1%82_%D0%BC%D0%B0%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B8,_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%BA%D0%B8_%D0%B8_%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%BD%D1%8B%D1%85_%D0%BD%D0%B0%D1%83%D0%BA_%D0%AE%D0%A4%D0%A3.jpg"),
+    --     (Place "Общежитие ЮФУ" 47.215548 39.636154 "Общежитие Южного Федерального Университета" 
+    --            "http://affiche.ru/wall/siniy_tron_wallpapers.jpg")
+    --     (Place "Покровский сквер" 47.225747 39.732361 "Покровский сквер Ростова-на-Дону" 
+    --            "http://autotravel.ru/phalbum/10133/11.jpg")
+    --     (Place "Театр драмы им. Горького" 47.228583 39.744871 "Театр" 
+    --            "http://www.openarium.ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%80%D0%BE%D1%81%D1%81%D0%B8%D1%8F/%D1%80%D0%BE%D1%81%D1%82%D0%BE%D0%B2-%D0%BD%D0%B0-%D0%B4%D0%BE%D0%BD%D1%83/%D1%80%D0%BE%D1%81%D1%82%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9-%D0%B0%D0%BA%D0%B0%D0%B4%D0%B5%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D1%82%D0%B5%D0%B0%D1%82%D1%80-%D0%B4%D1%80%D0%B0%D0%BC%D1%8B-%D0%B8%D0%BC-%D0%BC-%D0%B3%D0%BE%D1%80%D1%8C%D0%BA%D0%BE%D0%B3%D0%BE.jpg")
+    --     (Place "Вода" 47.217735 39.740026 "Вода. Она такая мокрая" 
+    --            "http://wallpapers.ssdn.ru/pic/ddcca33977.jpg")
+    --     ]
 
 data PlaceMetadata =
      PlaceMetadata { name :: !Text
@@ -110,10 +108,10 @@ postPlacesR = do
     case (contentsMaybe, fileMaybe, descMaybe, xMaybe, yMaybe) of
         (Just contents, Just file, Just desc, Just x, Just y) -> do
             path <- writeToServer contents
-            let place = (Place "a" --()
-                               2.3 --()
-                               3.3 --()
-                               "b" --()
+            let place = (Place file --()
+                               (read $ unpack x) --()
+                               (read $ unpack y) --()
+                               desc --()
                                (pack path))
             insertedPlace <- runDB $ insertEntity place
             returnJson insertedPlace
