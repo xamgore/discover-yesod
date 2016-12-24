@@ -71,7 +71,12 @@ getPlacesR = do
                           options :: [SelectOpt Place]
                           options = pageOptions pageSizeMaybe pageNumberMaybe
                        in selectList [] options
-    returnJson places
+    -- returnJson places
+
+    returnJson [
+        (Place "Мехмат" 47.216674 39.628794 "Институт математики, механики и компьютерных наук им. Воровича" 
+               "https://upload.wikimedia.org/wikipedia/commons/9/9a/%D0%A4%D0%B0%D0%BA%D1%83%D0%BB%D1%8C%D1%82%D0%B5%D1%82_%D0%BC%D0%B0%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B8,_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%BA%D0%B8_%D0%B8_%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%BD%D1%8B%D1%85_%D0%BD%D0%B0%D1%83%D0%BA_%D0%AE%D0%A4%D0%A3.jpg")
+        ]
 
 data PlaceMetadata =
      PlaceMetadata { name :: !Text
@@ -83,24 +88,6 @@ data PlaceMetadata =
 instance FromJSON PlaceMetadata 
 instance ToJSON PlaceMetadata 
 
-
-
--- postPlacesR :: Handler Value
--- postPlacesR = do
---     ((result, widget), enctype) <- runFormPost uploadForm
---     case result of
---         FormSuccess (file, info, date) -> do
---             -- TODO: check if image already exists
---             -- save to image directory
---             filename <- writeToServer file
---             _ <- runDB $ insert (Place name x y desc image)
---             place <- (requireJsonBody :: Handler Place)
---             insertedPlace <- runDB $ insertEntity place
---             returnJson insertedPlace    -- print (show $ fileSource file)
---         _ -> do
---             place <- (requireJsonBody :: Handler Place)
---             insertedPlace <- runDB $ insertEntity place
---             returnJson insertedPlace    -- print (show $ fileSource file)
 
 postPlacesR :: Handler Value
 postPlacesR = do
@@ -194,6 +181,30 @@ instance ToJSON VkResponse
 getVkFriends :: Value -> IO (Result VkResponse)
 getVkFriends = return . fromJSON
 
+
+-- data UserLeaderboard =
+--   UserLeaderboard { first_name :: !Text
+--                   , last_name :: !Text
+--                   , photo_medium :: !Text
+--                   , user_id :: Int
+--                   , discoveries :: Int 
+--                   } deriving (Show, Generic)
+
+data UserLeaderboardDbData =
+  UserLeaderboardDbData { access_token_ :: !Text } deriving (Show, Generic)
+
+instance FromJSON UserLeaderboardDbData
+instance ToJSON UserLeaderboardDbData 
+
+-- users :: UserId -> Handler [Entity UserLeaderboardDbData]
+-- users uid =
+--   runDB $ rawSql
+--     "SELECT  " ++
+--     "FROM  user " ++
+--     "WHERE id = 12605637"
+--     []
+
+
 getLeaderboardR :: Handler Value
 getLeaderboardR = do
     maybeUserId <- lookupCookie "user_id"
@@ -215,10 +226,10 @@ getLeaderboardR = do
             case vkRes of
                 Success vkResponse -> do 
                     let ids  = map user_id (response vkResponse)
-                    -- ret <- runDB $ select $ 
-                    --                from $ \user -> return user
-                    --                     -- where_ $ user ^. UserId in_ valList ids
-                    --                     -- return (user :: User) --(user ^. UserId)
+                    -- runDB $ E.select $ 
+                    --                from $ \user -> do
+                    --                     -- where_ ((user ^. UserId) >. 0) --in_ valList ids)
+                    --                     return (user :: User)
                     -- returnJson ret
                     -- liftIO $ print ret
                     sendResponseStatus status200 (TypedContent "text/html" "200")
