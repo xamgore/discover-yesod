@@ -109,6 +109,11 @@ postPlacesR = do
     descMaybe <- lookupFile "desc"
     xMaybe <- lookupFile "x"
     yMaybe <- lookupFile "y"
+    -- case contentsMaybe of
+    --     Just contents -> do
+    --         print (fileName contents)
+    --         sendResponseStatus status200 emptyObject
+    --     otherwise ->
     case (contentsMaybe, fileMaybe, descMaybe, xMaybe, yMaybe) of
         (Just contents, Just file, Just desc, Just x, Just y) -> do
             path <- writeToServer contents

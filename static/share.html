@@ -114,7 +114,7 @@
 
 <div class="content" style="margin: 5px">
     <div class="b-dropzone" @click="openFileDialog" style="padding-top: 10px">
-        <input ref="files" type="file" accept="image/*" name="files[]" class="b-dropzone__uploader" />
+        <input ref="photoToUpload" type="file" accept="image/*" name="photoToUpload" class="b-dropzone__uploader" />
 
         <div class="dropzone">
             <div class="dropzone-text">
@@ -165,14 +165,14 @@ var app = new Vue({
         back()   { window.history.back() },
 
         openFileDialog() {
-            this.$refs.files.click();
+            this.$refs.photoToUpload.click();
         },
 
         uploadFile() {
             let form = new FormData();
 
             var entries = {
-                contents:      this.$refs.files[0], // should fix this
+                contents:      this.$refs.photoToUpload.files[0], // should fix this
                 name:      this.name,
                 desc:      this.desc,
                 x:         this.coords.latitude,
@@ -185,6 +185,7 @@ var app = new Vue({
                 }
             }
 
+            // this.$http.post('/api/places', form);
             fetch('/api/places', { method: 'POST', body: form })
                 .then(res => console.log('sent!')/* || window.history.back()*/)
                 .catch(err => console.log(err));
