@@ -105,15 +105,10 @@ instance ToJSON PlaceMetadata
 postPlacesR :: Handler Value
 postPlacesR = do
     contentsMaybe <- lookupFile "contents"
-    fileMaybe <- lookupFile "name"
-    descMaybe <- lookupFile "desc"
-    xMaybe <- lookupFile "x"
-    yMaybe <- lookupFile "y"
-    -- case contentsMaybe of
-    --     Just contents -> do
-    --         print (fileName contents)
-    --         sendResponseStatus status200 emptyObject
-    --     otherwise ->
+    fileMaybe <- lookupPostParam "name"
+    descMaybe <- lookupPostParam "desc"
+    xMaybe <- lookupPostParam "x"
+    yMaybe <- lookupPostParam "y"
     case (contentsMaybe, fileMaybe, descMaybe, xMaybe, yMaybe) of
         (Just contents, Just file, Just desc, Just x, Just y) -> do
             path <- writeToServer contents
@@ -131,7 +126,7 @@ imageFilePath :: String -> FilePath
 imageFilePath f = uploadDirectory </> f
 
 uploadDirectory :: FilePath
-uploadDirectory = "static"
+uploadDirectory = "static/shared"
 
 writeToServer :: FileInfo -> Handler FilePath
 writeToServer file = do
