@@ -73,8 +73,25 @@ getPlacesR = do
                        in selectList [] options
     returnJson places
 
+data PlaceMetadata =
+     PlaceMetadata { name :: !Text
+                   , desc :: !Text
+                   , x    :: Double
+                   , y    :: Double
+              } deriving (Show, Generic)
+
+instance FromJSON PlaceMetadata 
+instance ToJSON PlaceMetadata 
+
+
 postPlacesR :: Handler Value
 postPlacesR = do
+    contents <- lookupFile "contents"
+    file <- lookupFile "metadata"
+    -- print (show $ fileSource file)
+    -- case file of
+    --     Just meta -> print meta --returnJson (fileSource meta)
+    --     _ -> sendResponseStatus 400 "Invalid metadata format"
     place <- (requireJsonBody :: Handler Place)
     insertedPlace <- runDB $ insertEntity place
     returnJson insertedPlace

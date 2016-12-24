@@ -172,11 +172,13 @@ var app = new Vue({
             let form = new FormData();
 
             var entries = {
-                file:      this.$refs.files[0],
-                name:      this.name,
-                desc:      this.desc,
-                latitude:  this.coords.latitude,
-                longitude: this.coords.longitude
+                contents:      this.$refs.files[0], // should fix this
+                metadata: {
+                    name:      this.name,
+                    desc:      this.desc,
+                    x:         this.coords.latitude,
+                    y:         this.coords.longitude
+                }
             };
 
             for (var key in entries) {
@@ -184,8 +186,6 @@ var app = new Vue({
                     form.append(key, entries[key]);
                 }
             }
-
-            form.append("aaaaaa", "bbbbbbb");
 
             fetch('/api/places', { method: 'POST', body: form });
             // TODO: turn off the button

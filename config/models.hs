@@ -7,6 +7,7 @@ Place json
     x Double
     y Double
     desc Text
+    image Text
     deriving Show
 
 Photo json
