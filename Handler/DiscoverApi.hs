@@ -84,6 +84,24 @@ instance FromJSON PlaceMetadata
 instance ToJSON PlaceMetadata 
 
 
+
+-- postPlacesR :: Handler Value
+-- postPlacesR = do
+--     ((result, widget), enctype) <- runFormPost uploadForm
+--     case result of
+--         FormSuccess (file, info, date) -> do
+--             -- TODO: check if image already exists
+--             -- save to image directory
+--             filename <- writeToServer file
+--             _ <- runDB $ insert (Place name x y desc image)
+--             place <- (requireJsonBody :: Handler Place)
+--             insertedPlace <- runDB $ insertEntity place
+--             returnJson insertedPlace    -- print (show $ fileSource file)
+--         _ -> do
+--             place <- (requireJsonBody :: Handler Place)
+--             insertedPlace <- runDB $ insertEntity place
+--             returnJson insertedPlace    -- print (show $ fileSource file)
+
 postPlacesR :: Handler Value
 postPlacesR = do
     contentsMaybe <- lookupFile "contents"
@@ -107,6 +125,18 @@ postPlacesR = do
     -- case file of
     --     Just meta -> print meta --returnJson (fileSource meta)
 
+imageFilePath :: String -> FilePath
+imageFilePath f = uploadDirectory </> f
+
+uploadDirectory :: FilePath
+uploadDirectory = "static"
+
+writeToServer :: FileInfo -> Handler FilePath
+writeToServer file = do
+    let filename = unpack $ fileName file
+        path = imageFilePath filename
+    liftIO $ fileMove file path
+    return filename
 
 getPlaceR :: PlaceId -> Handler Value
 getPlaceR = getEntity
