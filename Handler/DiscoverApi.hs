@@ -86,15 +86,27 @@ instance ToJSON PlaceMetadata
 
 postPlacesR :: Handler Value
 postPlacesR = do
-    contents <- lookupFile "contents"
-    file <- lookupFile "metadata"
-    -- print (show $ fileSource file)
+    contentsMaybe <- lookupFile "contents"
+    fileMaybe <- lookupFile "name"
+    descMaybe <- lookupFile "desc"
+    xMaybe <- lookupFile "x"
+    yMaybe <- lookupFile "y"
+    case (contentsMaybe, fileMaybe, descMaybe, xMaybe, yMaybe) of
+        (Just contents, Just file, Just desc, Just x, Just y) -> do
+            -- sendResponseStatus status400 "400 Bad Request"
+            -- returnJson ()    
+            let place = (Place "a" 1.0 1.0 "a" "a")
+            insertedPlace <- runDB $ insertEntity place
+            returnJson insertedPlace
+        otherwise -> do
+            -- sendResponseStatus status400 "400 Bad Request"
+            -- returnJson ()
+            place <- (requireJsonBody :: Handler Place)
+            insertedPlace <- runDB $ insertEntity place
+            returnJson insertedPlace    -- print (show $ fileSource file)
     -- case file of
     --     Just meta -> print meta --returnJson (fileSource meta)
-    --     _ -> sendResponseStatus 400 "Invalid metadata format"
-    place <- (requireJsonBody :: Handler Place)
-    insertedPlace <- runDB $ insertEntity place
-    returnJson insertedPlace
+
 
 getPlaceR :: PlaceId -> Handler Value
 getPlaceR = getEntity
