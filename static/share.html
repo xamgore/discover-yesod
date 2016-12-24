@@ -171,13 +171,21 @@ var app = new Vue({
         uploadFile() {
             let form = new FormData();
 
-            Object.entries({
+            var entries = {
                 file:      this.$refs.files[0],
                 name:      this.name,
                 desc:      this.desc,
                 latitude:  this.coords.latitude,
                 longitude: this.coords.longitude
-            }).forEach((k, v) => form.append(k, v));
+            };
+
+            for (var key in entries) {
+                if (entries.hasOwnProperty(key)) {
+                    form.append(key, entries[key]);
+                }
+            }
+
+            form.append("aaaaaa", "bbbbbbb");
 
             fetch('/api/places', { method: 'POST', body: form });
             // TODO: turn off the button
