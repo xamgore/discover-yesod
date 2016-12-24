@@ -8,15 +8,19 @@
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE ViewPatterns               #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Handler.DiscoverApi where
 
 import Import
 import Database.Persist.Sqlite
 import GHC.Generics ()
-import Data.Aeson ()
+import Data.Aeson.Encode (encodeToTextBuilder)
+import Data.Aeson 
 import Data.Aeson.Types ()
 import Data.Text.Read
 import Text.Read
+import qualified Data.ByteString.Char8 as S8
+import qualified Data.Yaml             as Yaml
 import qualified Database.Esqueleto      as E
 import           Database.Esqueleto      ((^.), select, from, in_, where_, valList)
 import           Web.Cookie
@@ -111,12 +115,28 @@ postPlacesPhotosR placeId = do
     insertedPhoto <- runDB $ insertEntity photo
     returnJson insertedPhoto
 
-data Person =
-  Person { firstName  :: !Text
-         , lastName   :: !Text
-         , age        :: Int
-         , likesPizza :: Bool
-           } deriving Show
+
+data VkUser =
+  VkUser { online       :: Int
+         , first_name   :: !Text
+         , last_name    :: !Text
+         , photo_medium :: !Text
+         , user_id :: Int
+           } deriving (Show, Generic)
+
+instance FromJSON VkUser 
+instance ToJSON VkUser 
+
+
+data VkResponse =
+  VkResponse { response :: [VkUser] } deriving (Show, Generic)
+
+instance FromJSON VkResponse 
+instance ToJSON VkResponse 
+
+
+getVkFriends :: Value -> IO (Result VkResponse)
+getVkFriends = return . fromJSON
 
 getLeaderboardR :: Handler Value
 getLeaderboardR = do
@@ -125,16 +145,29 @@ getLeaderboardR = do
         Just id -> do
             user <- runDB $ get404 id
             let UserKey {unUserKey = SqlBackendKey {unSqlBackendKey = uid}} = id
-                in do
-                    request  <- parseRequest $ 
-                                    "GET https://api.vk.com/method/friends.get?user_id=" ++ show uid ++
-                                    "&fields=uid,first_name,last_name,photo_medium&access_token=" ++ userToken user
-                    response <- httpJSON request
+            req  <- parseRequest $ 
+                            "GET https://api.vk.com/method/friends.get?user_id=" ++ show uid ++
+                            "&fields=first_name,last_name,photo_medium&access_token=" ++ userToken user
+            res <- httpJSON req
 
-                    let body  = getResponseBody response :: Value
-                    returnJson body
-            -- let body  = getResponseBody response :: Value
-            -- select $ from $ \user -> do
-            --         where_ $ user ^. UserId in_ valList body
-            --         return user
+            let body = (getResponseBody res :: Value)
+    
+            
+            vkRes <- liftIO $ do
+                getVkFriends body
+
+            case vkRes of
+                Success vkResponse -> do 
+                    let ids  = map user_id (response vkResponse)
+                    -- ret <- runDB $ select $ 
+                    --                from $ \user -> return user
+                    --                     -- where_ $ user ^. UserId in_ valList ids
+                    --                     -- return (user :: User) --(user ^. UserId)
+                    -- returnJson ret
+                    -- liftIO $ print ret
+                    sendResponseStatus status200 (TypedContent "text/html" "200")
+                _ -> sendResponseStatus status500 (TypedContent "text/html" "500 Internal Server Error")
+            -- returnJson body
+
+            -- returnJson (results body)
         Nothing -> sendResponseStatus status401 (TypedContent "text/html" "401 Unauthorized")

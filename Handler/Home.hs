@@ -78,7 +78,6 @@ authorizeUser = do
                     saveUser vk
                 _ ->
                     deleteCookie "user_id" ""
-                    -- TODO database changes
 
             (Just thisRoute) <- getCurrentRoute
             redirect thisRoute
@@ -98,7 +97,6 @@ getVkAuthToken url = do
     let body = getResponseBody response :: Value
     S8.putStrLn $ Yaml.encode body
     return $ fromJSON body
-
 
 getFriends :: VkAuth -> IO Text
 getFriends vkAuth = do
