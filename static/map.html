@@ -19,32 +19,38 @@
 <script>
     ymaps.ready(init);
 
-    function addMark(map, position, photoUrl, placeUrl) {
-            mark = new ymaps.Placemark(position, {
-                balloonContent: photoUrl
-            }, {
-                iconLayout: 'default#image',
-                iconImageHref: '/static/images/sprite.png',
-                iconImageSize: [92, 92],
-                iconImageOffset: [-46, -32]
-            });
+    function addMark(map, position, link, isPlus = false) {
+        let mark = new ymaps.Placemark(position, {
+            // balloonContent: photoUrl
+        }, {
+            iconLayout: 'default#image',
+            iconImageHref: isPlus ? '/static/images/plus.png' : '/static/images/sprite.png',
+            iconImageSize: [48, 48],
+            iconImageOffset: [-46, -32],
+            hasBaloon: false
+        });
 
+        mark.events.add('click', () => document.location.pathname = link)
         map.geoObjects.add(mark);
     }
 
     function init() {
+        navigator.geolocation.getCurrentPosition(pos => {
+                var map = new ymaps.Map("map", {
+                        center: [pos.coords.latitude, pos.coords.longitude],
+                        zoom: 15,
+                        controls: []
+                    }, { searchControlProvider: 'yandex#search' });
 
-        var map = new ymaps.Map("map", {
-                center: [47.217268, 39.716645],
-                zoom: 15,
-                controls: []
-            }, {
-                searchControlProvider: 'yandex#search'
-            });
+                addMark(map, [pos.coords.latitude, pos.coords.longitude], '/share', true);
 
-        addMark(map, [47.217268, 39.7166410], "asasasa");
+                fetch('/api/places').then(res => res.json()).then(res => {
+                    res.forEach( ({ name, x, y }, id) => addMark(map, [x, y], `/places/${id}`));
+                })
 
+            }, e => alert(`Can't get location, ${e.message.toLowerCase()} :(`) );
     }
+
 </script>
 
 </body>
